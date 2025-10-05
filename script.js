@@ -34,37 +34,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tempSession = null;
 
-    // --- Email Generation & Inbox Functions (with CORS Proxy) ---
+    // --- Email Generation & Inbox Functions (using Mail.gw) ---
     async function createAccount() {
         try {
-            const originalUrl = 'https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1';
-            const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+            // 1. Get a domain from Mail.gw
+            const domainRes = await fetch('https://api.mail.gw/domains');
+            if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.gw.');
+            const domains = await domainRes.json();
+            const domain = domains['hydra:member'][0]['domain'];
+
+            // 2. Generate random credentials
+            const username = Math.random().toString(36).substring(2, 12);
+            const password = Math.random().toString(36).substring(2, 15);
+            const email = `${username}@${domain}`;
+            const accountData = { address: email, password: password };
+
+            // 3. Create account on Mail.gw
+            await fetch('https://api.mail.gw/accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(accountData)
+            });
+
+            // 4. Get auth token for the new account
+            const tokenRes = await fetch('https://api.mail.gw/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(accountData)
+            });
+            if (!tokenRes.ok) throw new Error('Failed to get auth token.');
+            const tokenData = await tokenRes.json();
             
-            const res = await fetch(proxyUrl + originalUrl);
-            if (!res.ok) throw new Error('Failed to generate email from 1secmail via proxy.');
-            
-            const data = await res.json();
-            const email = data[0];
-            const password = Math.random().toString(36).substring(2, 12);
-            return { email, password, token: email };
+            return { email, password, token: tokenData.token };
+
         } catch (error) {
-            console.error("API Error:", error);
+            console.error("Mail.gw API Error:", error);
             alert(`Error creating email: ${error.message}`);
             return null;
         }
     }
 
-    async function checkInbox(email) {
-        if (!email) return;
+    async function checkInbox(token) {
+        if (!token) return;
         inboxStatus.textContent = "Checking for new messages...";
         inboxMessages.innerHTML = '';
-        const [login, domain] = email.split('@');
         try {
-            const originalUrl = `https://www.1secmail.com/api/v1/?action=getMessages&login=${login}&domain=${domain}`;
-            const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+            const res = await fetch('https://api.mail.gw/messages', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed to fetch messages.');
+            const data = await res.json();
+            const messages = data['hydra:member'];
 
-            const res = await fetch(proxyUrl + originalUrl);
-            const messages = await res.json();
             if (messages.length === 0) {
                 inboxStatus.textContent = "Your inbox is empty.";
             } else {
@@ -72,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 messages.forEach(msg => {
                     const msgDiv = document.createElement('div');
                     msgDiv.className = 'message';
-                    msgDiv.innerHTML = `<p><strong>From:</strong> <code>${msg.from}</code></p><p><strong>Subject:</strong> ${msg.subject}</p><p>${msg.date}</p>`;
+                    msgDiv.innerHTML = `<p><strong>From:</strong> <code>${msg.from.address}</code></p><p><strong>Subject:</strong> ${msg.subject}</p><p>${msg.intro}</p>`;
                     inboxMessages.appendChild(msgDiv);
                 });
             }
@@ -82,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Google Sheets Functions ---
+    // --- Google Sheets Functions (এগুলো অপরিবর্তিত) ---
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
@@ -95,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
         } catch (error) {
-            console.error("Error saving data to Google Sheet:", error);
+            console.error("Error saving data:", error);
             alert("তথ্য সেভ করার সময় একটি সমস্যা হয়েছে।");
         } finally {
             loader.classList.add('hidden');
@@ -124,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners ---
+    // --- Event Listeners (এগুলো অপরিবর্তিত) ---
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
@@ -146,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     checkInboxBtn.addEventListener('click', () => {
-        if (tempSession) checkInbox(tempSession.email);
+        if (tempSession) checkInbox(tempSession.token);
     });
 
     saveBtn.addEventListener('click', () => {
