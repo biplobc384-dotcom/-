@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/আপনার-ইউআরএল-এখানে/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
 
     const ADMIN_USERNAME = 'admin';
     const ADMIN_PASSWORD = 'Arifur';
@@ -190,3 +190,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('password').value = '';
     });
 });
+
