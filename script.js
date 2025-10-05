@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
 
+    // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
     const ADMIN_PASSWORD = 'Arifur';
 
+    // --- HTML Elements ---
     const userSection = document.getElementById('user-section');
     const generateBtn = document.getElementById('generateBtn');
     const loader = document.getElementById('loader');
@@ -32,16 +34,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tempSession = null;
 
+    // --- Email Generation & Inbox Functions (with CORS Proxy) ---
     async function createAccount() {
         try {
-            const res = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
-            if (!res.ok) throw new Error('Failed to generate email from 1secmail.');
+            const originalUrl = 'https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1';
+            const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+            
+            const res = await fetch(proxyUrl + originalUrl);
+            if (!res.ok) throw new Error('Failed to generate email from 1secmail via proxy.');
+            
             const data = await res.json();
             const email = data[0];
             const password = Math.random().toString(36).substring(2, 12);
             return { email, password, token: email };
         } catch (error) {
-            console.error("1secmail API Error:", error);
+            console.error("API Error:", error);
             alert(`Error creating email: ${error.message}`);
             return null;
         }
@@ -53,7 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
         inboxMessages.innerHTML = '';
         const [login, domain] = email.split('@');
         try {
-            const res = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${login}&domain=${domain}`);
+            const originalUrl = `https://www.1secmail.com/api/v1/?action=getMessages&login=${login}&domain=${domain}`;
+            const proxyUrl = 'https://thingproxy.freeboard.io/fetch/';
+
+            const res = await fetch(proxyUrl + originalUrl);
             const messages = await res.json();
             if (messages.length === 0) {
                 inboxStatus.textContent = "Your inbox is empty.";
@@ -72,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Google Sheets Functions ---
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
@@ -79,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: JSON.stringify(dataToSave)
             });
             alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
@@ -113,13 +124,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Event Listeners ---
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
         newEmailSection.classList.add('hidden');
+        
         const account = await createAccount();
+        
         loader.classList.add('hidden');
         generateBtn.disabled = false;
+
         if (account) {
             tempSession = account;
             emailDisplay.textContent = account.email;
@@ -190,4 +205,3 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('password').value = '';
     });
 });
-
