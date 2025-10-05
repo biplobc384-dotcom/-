@@ -1,228 +1,118 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
-    // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
+    // Firebase ওয়েবসাইট থেকে পাওয়া আপনার নিজের কনফিগারেশন কোডটি এখানে পেস্ট করুন
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnZkmB6RSqhq3-5osv-g7DLVoP30WBteY",
+      authDomain: "arifurhackworld.firebaseapp.com",
+      projectId: "arifurhackworld",
+      storageBucket: "arifurhackworld.firebasestorage.app",
+      messagingSenderId: "911113151211",
+      appId: "1:911113151211:web:8a79b62c26870771aa14ae",
+    measurementId: "G-REHTXT93C4"
+    };
 
-    // --- ADMIN ---
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'Arifur';
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // --- HTML Elements ---
-    const userSection = document.getElementById('user-section');
-    const generateBtn = document.getElementById('generateBtn');
-    const loader = document.getElementById('loader');
-    const newEmailSection = document.getElementById('new-email-section');
-    const emailDisplay = document.getElementById('email-display');
-    const passwordDisplay = document.getElementById('password-display');
-    const checkInboxBtn = document.getElementById('checkInboxBtn');
-    const inboxStatus = document.getElementById('inbox-status');
-    const inboxMessages = document.getElementById('inbox-messages');
-    const saveKeyInput = document.getElementById('save-key');
-    const saveBtn = document.getElementById('saveBtn');
-    const discardBtn = document.getElementById('discardBtn');
-    
-    const adminPanel = document.getElementById('admin-panel');
-    const adminLoginBtn = document.getElementById('adminLoginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const adminDataTable = document.getElementById('admin-data-table');
-    
-    const loginModal = document.getElementById('login-modal');
+    // --- Views ---
+    const loginView = document.getElementById('login-view');
+    const registerView = document.getElementById('register-view');
+    const appView = document.getElementById('app-view');
+
+    // --- Forms & Buttons ---
     const loginForm = document.getElementById('login-form');
-    const closeButton = document.querySelector('.close-button');
-    const loginError = document.getElementById('login-error');
+    const registerForm = document.getElementById('register-form');
+    const logoutBtn = document.getElementById('logout-btn');
+    const showRegisterBtn = document.getElementById('show-register-btn');
+    const showLoginBtn = document.getElementById('show-login-btn');
+    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    
+    // --- App Elements ---
+    const welcomeMessage = document.getElementById('welcome-message');
+    const generateBtn = document.getElementById('generateBtn');
 
-    let tempSession = null;
-
-    // --- Email Generation & Inbox Functions (using Mail.gw) ---
-    async function createAccount() {
-        try {
-            // 1. Get a domain from Mail.gw
-            const domainRes = await fetch('https://api.mail.gw/domains');
-            if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.gw.');
-            const domains = await domainRes.json();
-            const domain = domains['hydra:member'][0]['domain'];
-
-            // 2. Generate random credentials
-            const username = Math.random().toString(36).substring(2, 12);
-            const password = Math.random().toString(36).substring(2, 15);
-            const email = `${username}@${domain}`;
-            const accountData = { address: email, password: password };
-
-            // 3. Create account on Mail.gw
-            await fetch('https://api.mail.gw/accounts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accountData)
-            });
-
-            // 4. Get auth token for the new account
-            const tokenRes = await fetch('https://api.mail.gw/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accountData)
-            });
-            if (!tokenRes.ok) throw new Error('Failed to get auth token.');
-            const tokenData = await tokenRes.json();
-            
-            return { email, password, token: tokenData.token };
-
-        } catch (error) {
-            console.error("Mail.gw API Error:", error);
-            alert(`Error creating email: ${error.message}`);
-            return null;
-        }
-    }
-
-    async function checkInbox(token) {
-        if (!token) return;
-        inboxStatus.textContent = "Checking for new messages...";
-        inboxMessages.innerHTML = '';
-        try {
-            const res = await fetch('https://api.mail.gw/messages', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Failed to fetch messages.');
-            const data = await res.json();
-            const messages = data['hydra:member'];
-
-            if (messages.length === 0) {
-                inboxStatus.textContent = "Your inbox is empty.";
-            } else {
-                inboxStatus.textContent = `You have ${messages.length} message(s).`;
-                messages.forEach(msg => {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = 'message';
-                    msgDiv.innerHTML = `<p><strong>From:</strong> <code>${msg.from.address}</code></p><p><strong>Subject:</strong> ${msg.subject}</p><p>${msg.intro}</p>`;
-                    inboxMessages.appendChild(msgDiv);
-                });
-            }
-        } catch (error) {
-            console.error("Inbox Check Error:", error);
-            inboxStatus.textContent = "Error checking inbox.";
-        }
-    }
-
-    // --- Google Sheets Functions (এগুলো অপরিবর্তিত) ---
-    async function saveAccount(key, account) {
-        loader.classList.remove('hidden');
-        try {
-            const dataToSave = { key, email: account.email, password: account.password };
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: JSON.stringify(dataToSave)
-            });
-            alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
-        } catch (error) {
-            console.error("Error saving data:", error);
-            alert("তথ্য সেভ করার সময় একটি সমস্যা হয়েছে।");
-        } finally {
-            loader.classList.add('hidden');
-        }
-    }
-
-    async function loadAdminData() {
-        adminDataTable.innerHTML = '<p>ব্যবহারকারীদের তথ্য লোড হচ্ছে...</p>';
-        try {
-            const response = await fetch(SCRIPT_URL);
-            const data = await response.json();
-            if (data.length < 2) {
-                 adminDataTable.innerHTML = '<p>এখনও কোনো তথ্য সেভ করা হয়নি।</p>';
-                 return;
-            }
-            const headers = data.shift();
-            let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>${headers[2]}</th><th>${headers[3]}</th></tr></thead><tbody>`;
-            data.forEach(row => {
-                tableHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${new Date(row[3]).toLocaleString('bn-BD')}</td></tr>`;
-            });
-            tableHTML += '</tbody></table>';
-            adminDataTable.innerHTML = tableHTML;
-        } catch (error) {
-            console.error("Error loading admin data:", error);
-            adminDataTable.innerHTML = '<p>তথ্য লোড করার সময় একটি সমস্যা হয়েছে।</p>';
-        }
-    }
-
-    // --- Event Listeners (এগুলো অপরিবর্তিত) ---
-    generateBtn.addEventListener('click', async () => {
-        loader.classList.remove('hidden');
-        generateBtn.disabled = true;
-        newEmailSection.classList.add('hidden');
-        
-        const account = await createAccount();
-        
-        loader.classList.add('hidden');
-        generateBtn.disabled = false;
-
-        if (account) {
-            tempSession = account;
-            emailDisplay.textContent = account.email;
-            passwordDisplay.textContent = account.password;
-            newEmailSection.classList.remove('hidden');
-            inboxStatus.textContent = "Your inbox is empty.";
-            inboxMessages.innerHTML = '';
+    // --- Authentication Logic ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // User is signed in
+            loginView.classList.add('hidden');
+            registerView.classList.add('hidden');
+            appView.classList.remove('hidden');
+            welcomeMessage.textContent = `Welcome, ${user.email}`;
+            // Load user-specific data if needed
+        } else {
+            // User is signed out
+            loginView.classList.remove('hidden');
+            registerView.classList.add('hidden');
+            appView.classList.add('hidden');
         }
     });
 
-    checkInboxBtn.addEventListener('click', () => {
-        if (tempSession) checkInbox(tempSession.token);
-    });
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const errorP = document.getElementById('register-error');
 
-    saveBtn.addEventListener('click', () => {
-        const key = saveKeyInput.value.trim();
-        if (!key) {
-            alert('তথ্য সেভ করার জন্য একটি কী (Key) দিন।');
-            return;
-        }
-        if (tempSession) {
-            saveAccount(key, tempSession).then(() => {
-                tempSession = null;
-                newEmailSection.classList.add('hidden');
-                saveKeyInput.value = '';
+        auth.createUserWithEmailAndPassword(email, password)
+            .catch(error => {
+                errorP.textContent = error.message;
             });
-        }
-    });
-
-    discardBtn.addEventListener('click', () => {
-        tempSession = null;
-        newEmailSection.classList.add('hidden');
-    });
-
-    adminLoginBtn.addEventListener('click', () => {
-        loginModal.classList.remove('hidden');
-    });
-
-    closeButton.addEventListener('click', () => {
-        loginModal.classList.add('hidden');
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target == loginModal) loginModal.classList.add('hidden');
     });
 
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-            loginModal.classList.add('hidden');
-            userSection.classList.add('hidden');
-            adminPanel.classList.remove('hidden');
-            adminLoginBtn.classList.add('hidden');
-            loadAdminData();
-        } else {
-            loginError.textContent = 'ভুল ইউজারনেম অথবা পাসওয়ার্ড।';
-        }
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorP = document.getElementById('login-error');
+
+        auth.signInWithEmailAndPassword(email, password)
+            .catch(error => {
+                errorP.textContent = error.message;
+            });
     });
 
     logoutBtn.addEventListener('click', () => {
-        userSection.classList.remove('hidden');
-        adminPanel.classList.add('hidden');
-        adminLoginBtn.classList.remove('hidden');
-        loginError.textContent = '';
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
+        auth.signOut();
     });
+
+    forgotPasswordBtn.addEventListener('click', () => {
+        const email = document.getElementById('login-email').value;
+        const errorP = document.getElementById('login-error');
+        if (!email) {
+            errorP.textContent = 'Please enter your email address to reset password.';
+            return;
+        }
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
+                alert('Password reset email sent! Please check your inbox.');
+                errorP.textContent = '';
+            })
+            .catch(error => {
+                errorP.textContent = error.message;
+            });
+    });
+
+    showRegisterBtn.addEventListener('click', () => {
+        loginView.classList.add('hidden');
+        registerView.classList.remove('hidden');
+    });
+
+    showLoginBtn.addEventListener('click', () => {
+        loginView.classList.remove('hidden');
+        registerView.classList.add('hidden');
+    });
+
+    // --- App Logic ---
+    generateBtn.addEventListener('click', () => {
+        // Your existing generate email logic
+        alert("Generate Email button clicked! (Add email generation logic here)");
+        // e.g., createAccount().then(account => { ... });
+    });
+    
+    // (এখানে আপনার createAccount, checkInbox, saveAccount, loadSavedAccounts ফাংশনগুলো যোগ করতে হবে)
+    // গুরুত্বপূর্ণ: saveAccount ফাংশনটিকে পরিবর্তন করতে হবে যাতে এটি বর্তমান ব্যবহারকারীর uid ব্যবহার করে তথ্য সেভ করে।
 });
