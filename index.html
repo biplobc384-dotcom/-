@@ -8,66 +8,67 @@
 </head>
 <body>
     <div class="container">
-        <div id="user-section">
-            <h1>Temp Mail Generator 📨</h1>
+        <div id="login-view" class="card">
+            <h1>Login</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit">Login</button>
+                <p id="login-error" class="error-message"></p>
+                <div class="auth-links">
+                    <button type="button" id="show-register-btn" class="link-button">Create an account</button>
+                    <button type="button" id="forgot-password-btn" class="link-button">Forgot Password?</button>
+                </div>
+            </form>
+        </div>
 
+        <div id="register-view" class="card hidden">
+            <h1>Create Account</h1>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit">Register</button>
+                <p id="register-error" class="error-message"></p>
+                <div class="auth-links">
+                    <button type="button" id="show-login-btn" class="link-button">Already have an account? Login</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="app-view" class="hidden">
+            <div class="app-header">
+                <h1>Temp Mail Generator 📨</h1>
+                <div id="welcome-message"></div>
+                <button id="logout-btn" class="danger">Logout</button>
+            </div>
             <div class="card main-controls">
                 <button id="generateBtn">🔄 Generate New Email</button>
                 <div id="loader" class="loader hidden"></div>
             </div>
-            
             <div id="new-email-section" class="card hidden">
-                <h3>Your New Account Details</h3>
-                <div class="credentials">
-                    <p><strong>Email:</strong> <code id="email-display"></code></p>
-                    <p><strong>Password:</strong> <code id="password-display"></code></p>
                 </div>
-                <div class="inbox-container">
-                    <h4>📥 Inbox</h4>
-                    <p id="inbox-status">Click "Check Inbox" to see messages.</p>
-                    <button id="checkInboxBtn">Check Inbox</button>
-                    <div id="inbox-messages"></div>
-                </div>
-                <div class="save-section">
-                    <input type="text" id="save-key" placeholder="Enter a key to save">
-                    <button id="saveBtn">💾 Save This Account</button>
-                    <button id="discardBtn" class="danger">🗑️ Discard</button>
-                </div>
+            <div class="card">
+                <h2>💾 My Saved Accounts</h2>
+                <div id="saved-accounts-list"></div>
             </div>
         </div>
-
-        <div id="admin-panel" class="card hidden">
-            <h1>Admin Dashboard</h1>
-            <p>Here is all the data saved from the Google Sheet.</p>
-            <button id="logoutBtn" class="danger">Logout</button>
-            <hr>
-            <h2>All Saved Data</h2>
-            <div id="admin-data-table"></div>
-        </div>
-        
-        <div class="admin-login-footer">
-            <button id="adminLoginBtn">Admin Login</button>
-        </div>
     </div>
-
-    <div id="login-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Admin Login</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" required>
-                </div>
-                <button type="submit">Login</button>
-                <p id="login-error" class="error-message"></p>
-            </form>
-        </div>
-    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script src="script.js"></script> 
 </body>
