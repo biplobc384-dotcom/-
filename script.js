@@ -1,15 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
-    // Google Apps Script URL বা Firebase Config এখানে থাকবে
+    // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/আপনার-ইউআরএল-এখানে/exec";
 
-    // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
     const ADMIN_PASSWORD = 'Arifur';
 
-    // --- HTML Elements ---
-    // User Section
     const userSection = document.getElementById('user-section');
     const generateBtn = document.getElementById('generateBtn');
     const loader = document.getElementById('loader');
@@ -22,15 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveKeyInput = document.getElementById('save-key');
     const saveBtn = document.getElementById('saveBtn');
     const discardBtn = document.getElementById('discardBtn');
-    const savedAccountsList = document.getElementById('saved-accounts-list');
-
-    // Admin Section
+    
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginBtn = document.getElementById('adminLoginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminDataTable = document.getElementById('admin-data-table');
     
-    // Modal Section
     const loginModal = document.getElementById('login-modal');
     const loginForm = document.getElementById('login-form');
     const closeButton = document.querySelector('.close-button');
@@ -38,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tempSession = null;
 
-    // --- Email Generation Functions ---
     async function createAccount() {
         try {
             const res = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
@@ -79,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Google Sheets Functions ---
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
@@ -87,9 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
                 body: JSON.stringify(dataToSave)
             });
             alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
@@ -123,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners ---
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
