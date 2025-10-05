@@ -3,12 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Firebase ওয়েবসাইট থেকে পাওয়া আপনার নিজের কনফিগারেশন কোডটি এখানে পেস্ট করুন
     // =================================================================
     const firebaseConfig = {
-      apiKey: "AIzaSyCnZkmB6RSqhq3-5osv-g7DLVoP30WBteY",
-      authDomain: "arifurhackworld.firebaseapp.com",
-      projectId: "arifurhackworld",
-      storageBucket: "arifurhackworld.firebasestorage.app",
-      messagingSenderId: "911113151211",
-      appId: "1:911113151211:web:8a79b62c26870771aa14ae"
+     apiKey: "AIzaSyCnZkmB6RSqhq3-5osv-g7DLVoP30WBteY",
+  authDomain: "arifurhackworld.firebaseapp.com",
+  projectId: "arifurhackworld",
+  storageBucket: "arifurhackworld.firebasestorage.app",
+  messagingSenderId: "911113151211",
+  appId: "1:911113151211:web:8a79b62c26870771aa14ae",
+  measurementId: "G-REHTXT93C4"
     };
 
     // Initialize Firebase
@@ -233,4 +234,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // (এখানে আপনার createAccount, checkInbox, saveAccount, loadSavedAccounts ফাংশনগুলো যোগ করতে হবে)
     // গুরুত্বপূর্ণ: saveAccount ফাংশনটিকে পরিবর্তন করতে হবে যাতে এটি বর্তমান ব্যবহারকারীর uid ব্যবহার করে তথ্য সেভ করে।
 });
+
 
