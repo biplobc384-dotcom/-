@@ -17,12 +17,21 @@
             </div>
             
             <div id="new-email-section" class="card hidden">
+                <h3>Your New Account Details</h3>
+                <div class="credentials">
+                    <p><strong>Email:</strong> <code id="email-display"></code></p>
+                    <p><strong>Password:</strong> <code id="password-display"></code></p>
                 </div>
-
-            <div class="card">
-                <h2>💾 Saved Accounts</h2>
-                <div id="saved-accounts-list">
-                    <p>No accounts saved yet.</p>
+                <div class="inbox-container">
+                    <h4>📥 Inbox</h4>
+                    <p id="inbox-status">Click "Check Inbox" to see messages.</p>
+                    <button id="checkInboxBtn">Check Inbox</button>
+                    <div id="inbox-messages"></div>
+                </div>
+                <div class="save-section">
+                    <input type="text" id="save-key" placeholder="Enter a key to save">
+                    <button id="saveBtn">💾 Save This Account</button>
+                    <button id="discardBtn" class="danger">🗑️ Discard</button>
                 </div>
             </div>
         </div>
