@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     // Supabase থেকে পাওয়া আপনার URL এবং Public Key এখানে পেস্ট করুন
     // =================================================================
-    const SUPABASE_URL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3Mjg5MjUsImV4cCI6MjA3NTMwNDkyNX0.7UHH2a5SEPomulPjG-d3_WGrrSjyB6wwQh202qkE640';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTcyODkyNSwiZXhwIjoyMDc1MzA0OTI1fQ.wzZPX7lJB0bIeeZkmRdnmpxti0YZCvAUTqoQ_bCXkYs';
+    const SUPABASE_URL = 'https://fogywudjbxhafinnewth.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3Mjg5MjUsImV4cCI6MjA3NTMwNDkyNX0.7UHH2a5SEPomulPjG-d3_WGrrSjyB6wwQh202qkE640';
 
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -107,4 +107,5 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("Generate Email button clicked! (Add your email generation logic here)");
     });
 });
+
 
