@@ -32,7 +32,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = document.querySelector('.close-button');
     const loginError = document.getElementById('login-error');
 
+    // User Name Modal Elements
+    const nameModal = document.getElementById('name-modal');
+    const nameForm = document.getElementById('name-form');
+    const userNameInput = document.getElementById('userNameInput');
+
     let tempSession = null;
+    let currentUserName = null;
+
+    // --- User Name Handling ---
+    function checkUserName() {
+        const savedName = localStorage.getItem('tempMailUserName');
+        if (savedName) {
+            currentUserName = savedName;
+            nameModal.classList.add('hidden');
+            userSection.classList.remove('hidden');
+        } else {
+            nameModal.classList.remove('hidden');
+        }
+    }
+
+    nameForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const userName = userNameInput.value.trim();
+        if (userName) {
+            localStorage.setItem('tempMailUserName', userName);
+            currentUserName = userName;
+            nameModal.classList.add('hidden');
+            userSection.classList.remove('hidden');
+        }
+    });
+    
+    // Initial check when page loads
+    checkUserName();
+
 
     // --- Email Generation & Inbox Functions (using Mail.tm) ---
     async function createAccount() {
@@ -97,17 +130,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     inboxMessages.appendChild(msgDiv);
                 });
             }
-        } catch (error) {
+        } catch (error)
+ {
             console.error("Inbox Check Error:", error);
             inboxStatus.textContent = "Error checking inbox.";
         }
     }
 
-    // --- Google Sheets Functions (এগুলো অপরিবর্তিত) ---
+    // --- Google Sheets Functions ---
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
-            const dataToSave = { key, email: account.email, password: account.password };
+            // ডেটার সাথে ব্যবহারকারীর নাম যোগ করা হলো
+            const dataToSave = { 
+                key, 
+                email: account.email, 
+                password: account.password,
+                userName: currentUserName // Add user name
+            };
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -133,9 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
                  return;
             }
             const headers = data.shift();
-            let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>${headers[2]}</th><th>${headers[3]}</th></tr></thead><tbody>`;
+            // টেবিলের 헤더 এ User Name যোগ করা হলো
+            let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>${headers[2]}</th><th>User Name</th><th>${headers[3]}</th></tr></thead><tbody>`;
             data.forEach(row => {
-                tableHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${new Date(row[3]).toLocaleString('bn-BD')}</td></tr>`;
+                // টেবিলের সারিতে ব্যবহারকারীর নাম যোগ করা হলো
+                tableHTML += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[4] || 'N/A'}</td><td>${new Date(row[3]).toLocaleString('bn-BD')}</td></tr>`;
             });
             tableHTML += '</tbody></table>';
             adminDataTable.innerHTML = tableHTML;
@@ -145,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners (এগুলো অপরিবর্তিত) ---
+    // --- Event Listeners ---
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
@@ -209,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
             loginModal.classList.add('hidden');
             userSection.classList.add('hidden');
+            nameModal.classList.add('hidden'); // Hide name modal in admin view
             adminPanel.classList.remove('hidden');
             adminLoginBtn.classList.add('hidden');
             loadAdminData();
@@ -224,5 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loginError.textContent = '';
         document.getElementById('username').value = '';
         document.getElementById('password').value = '';
+        checkUserName(); // Re-check user name on logout
     });
 });
