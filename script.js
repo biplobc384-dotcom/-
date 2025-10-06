@@ -1,217 +1,81 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
-    // Firebase ওয়েবসাইট থেকে পাওয়া আপনার নিজের কনফিগারেশন কোডটি এখানে পেস্ট করুন
+    // Supabase থেকে পাওয়া আপনার URL এবং Public Key এখানে পেস্ট করুন
     // =================================================================
-    const firebaseConfig = {
-    apiKey: "AIzaSyCnZkmB6RSqhq3-5osv-g7DLVoP30WBteY",
-  authDomain: "arifurhackworld.firebaseapp.com",
-  projectId: "arifurhackworld",
-  storageBucket: "arifurhackworld.firebasestorage.app",
-  messagingSenderId: "911113151211",
-  appId: "1:911113151211:web:8a9663891838a489aa14ae",
-  measurementId: "G-S5CQJHKBRX"
-    };
+    const SUPABASE_URL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTcyODkyNSwiZXhwIjoyMDc1MzA0OTI1fQ.wzZPX7lJB0bIeeZkmRdnmpxti0YZCvAUTqoQ_bCXkYs';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3Mjg5MjUsImV4cCI6MjA3NTMwNDkyNX0.7UHH2a5SEPomulPjG-d3_WGrrSjyB6wwQh202qkE640';
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- Views ---
+    // --- Views & Forms ---
     const loginView = document.getElementById('login-view');
     const registerView = document.getElementById('register-view');
     const appView = document.getElementById('app-view');
-
-    // --- Forms & Buttons ---
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const logoutBtn = document.getElementById('logout-btn');
     const showRegisterBtn = document.getElementById('show-register-btn');
     const showLoginBtn = document.getElementById('show-login-btn');
     const forgotPasswordBtn = document.getElementById('forgot-password-btn');
-    
-    // --- App Elements ---
     const welcomeMessage = document.getElementById('welcome-message');
     const generateBtn = document.getElementById('generateBtn');
-    const newEmailSection = document.getElementById('new-email-section');
-    const savedAccountsList = document.getElementById('saved-accounts-list');
-
-    // --- Authentication State Observer ---
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            // User is signed in
-            loginView.classList.add('hidden');
-            registerView.classList.add('hidden');
-            appView.classList.remove('hidden');
-            welcomeMessage.textContent = `Welcome, ${user.email}`;
-            // (আপনি চাইলে এখানে ব্যবহারকারীর সেভ করা ইমেলগুলো লোড করার ফাংশন কল করতে পারেন)
-        } else {
-            // User is signed out
-            loginView.classList.remove('hidden');
-            registerView.classList.add('hidden');
-            appView.classList.add('hidden');
-        }
-    });
-
-    // --- Authentication Event Listeners ---
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
-        const errorP = document.getElementById('register-error');
-        errorP.textContent = '';
-
-        auth.createUserWithEmailAndPassword(email, password)
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
-    });
-
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const errorP = document.getElementById('login-error');
-        errorP.textContent = '';
-
-        auth.signInWithEmailAndPassword(email, password)
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
-    });
-
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
-    });
-
-    forgotPasswordBtn.addEventListener('click', () => {
-        const email = document.getElementById('login-email').value;
-        const errorP = document.getElementById('login-error');
-        if (!email) {
-            errorP.textContent = 'Please enter your email to reset the password.';
-            return;
-        }
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert('Password reset email sent! Please check your inbox.');
-                errorP.textContent = '';
-            })
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
-    });
-
-    showRegisterBtn.addEventListener('click', () => {
-        loginView.classList.add('hidden');
-        registerView.classList.remove('hidden');
-    });
-
-    showLoginBtn.addEventListener('click', () => {
-        loginView.classList.remove('hidden');
-        registerView.classList.add('hidden');
-    });
-
-    // --- App Logic ---
-    generateBtn.addEventListener('click', () => {
-        // (এখানে আপনার createAccount, checkInbox, saveAccount ফাংশনগুলো এবং তাদের লজিক যোগ করতে হবে)
-        alert("Generate Email button clicked! Add your email generation logic here.");
-    });
-});document.addEventListener('DOMContentLoaded', () => {
-    // =================================================================
-    // Firebase ওয়েবসাইট থেকে পাওয়া আপনার নিজের কনফিগারেশন কোডটি এখানে পেস্ট করুন
-    // =================================================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyCnZkmB6RSqhq3-5osv-g7DLVoP30WBteY",
-      authDomain: "arifurhackworld.firebaseapp.com",
-      projectId: "arifurhackworld",
-      storageBucket: "arifurhackworld.firebasestorage.app",
-      messagingSenderId: "911113151211",
-      appId: "1:911113151211:web:8a79b62c26870771aa14ae",
-    measurementId: "G-REHTXT93C4"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // --- Views ---
-    const loginView = document.getElementById('login-view');
-    const registerView = document.getElementById('register-view');
-    const appView = document.getElementById('app-view');
-
-    // --- Forms & Buttons ---
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const logoutBtn = document.getElementById('logout-btn');
-    const showRegisterBtn = document.getElementById('show-register-btn');
-    const showLoginBtn = document.getElementById('show-login-btn');
-    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
     
-    // --- App Elements ---
-    const welcomeMessage = document.getElementById('welcome-message');
-    const generateBtn = document.getElementById('generateBtn');
-
     // --- Authentication Logic ---
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            // User is signed in
-            loginView.classList.add('hidden');
-            registerView.classList.add('hidden');
-            appView.classList.remove('hidden');
-            welcomeMessage.textContent = `Welcome, ${user.email}`;
-            // Load user-specific data if needed
+    const user = supabase.auth.user();
+    if (user) {
+        showAppView(user);
+    } else {
+        showLoginView();
+    }
+    
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user) {
+            showAppView(session.user);
         } else {
-            // User is signed out
-            loginView.classList.remove('hidden');
-            registerView.classList.add('hidden');
-            appView.classList.add('hidden');
+            showLoginView();
         }
     });
 
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const errorP = document.getElementById('register-error');
+        errorP.textContent = '';
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) errorP.textContent = error.message;
     });
 
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         const errorP = document.getElementById('login-error');
-
-        auth.signInWithEmailAndPassword(email, password)
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
+        errorP.textContent = '';
+        
+        const { error } = await supabase.auth.signIn({ email, password });
+        if (error) errorP.textContent = error.message;
     });
 
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
+    logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
     });
 
-    forgotPasswordBtn.addEventListener('click', () => {
+    forgotPasswordBtn.addEventListener('click', async () => {
         const email = document.getElementById('login-email').value;
         const errorP = document.getElementById('login-error');
         if (!email) {
-            errorP.textContent = 'Please enter your email address to reset password.';
+            errorP.textContent = 'Please enter your email to reset password.';
             return;
         }
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert('Password reset email sent! Please check your inbox.');
-                errorP.textContent = '';
-            })
-            .catch(error => {
-                errorP.textContent = error.message;
-            });
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        if (error) {
+            errorP.textContent = error.message;
+        } else {
+            alert('Password reset email sent! Please check your inbox.');
+            errorP.textContent = '';
+        }
     });
 
     showRegisterBtn.addEventListener('click', () => {
@@ -224,17 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
         registerView.classList.add('hidden');
     });
 
+    // --- View Management ---
+    function showLoginView() {
+        loginView.classList.remove('hidden');
+        registerView.classList.add('hidden');
+        appView.classList.add('hidden');
+    }
+
+    function showAppView(user) {
+        loginView.classList.add('hidden');
+        registerView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        welcomeMessage.textContent = `Welcome, ${user.email}`;
+    }
+
     // --- App Logic ---
     generateBtn.addEventListener('click', () => {
-        // Your existing generate email logic
-        alert("Generate Email button clicked! (Add email generation logic here)");
-        // e.g., createAccount().then(account => { ... });
+        alert("Generate Email button clicked! (Add your email generation logic here)");
     });
-    
-    // (এখানে আপনার createAccount, checkInbox, saveAccount, loadSavedAccounts ফাংশনগুলো যোগ করতে হবে)
-    // গুরুত্বপূর্ণ: saveAccount ফাংশনটিকে পরিবর্তন করতে হবে যাতে এটি বর্তমান ব্যবহারকারীর uid ব্যবহার করে তথ্য সেভ করে।
 });
-
-
-
-
