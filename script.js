@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     // Google Apps Script Web App URL
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhtKSI4OwM1QtP-SG84C2Xl9MXCjwrUbhuWh1MfCjdcyOcvncO9jhjtrOcAh4AFEyU/exec";
 
     // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
@@ -286,3 +286,4 @@ document.addEventListener('DOMContentLoaded', () => {
         checkUserName(); 
     });
 });
+
