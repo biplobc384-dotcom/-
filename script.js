@@ -1,20 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // =================================================================
     // Google Apps Script Web App URL
-    // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhtKSI4OwM1QtP-SG84C2Xl9MXCjwrUbhuWh1MfCjdcyOcvncO9jhjtrOcAh4AFEyU/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyztk5bRNNqbipf5_cQdK6N7fTRUtNhsWO-7N0_lSvkshiCsrV6RLaFfZMlX0jkBWCv/exec";
 
-    // --- ADMIN ---
+    // ADMIN
     const ADMIN_USERNAME = 'admin';
     const ADMIN_PASSWORD = 'Arifur';
 
-    // --- HTML Elements ---
+    // HTML Elements
     const userSection = document.getElementById('user-section');
     const generateBtn = document.getElementById('generateBtn');
     const loader = document.getElementById('loader');
     const newEmailSection = document.getElementById('new-email-section');
     const emailDisplay = document.getElementById('email-display');
-    const usernameDisplay = document.getElementById('username-display'); // New element for username
+    const usernameDisplay = document.getElementById('username-display');
     const passwordDisplay = document.getElementById('password-display');
     const checkInboxBtn = document.getElementById('checkInboxBtn');
     const inboxStatus = document.getElementById('inbox-status');
@@ -22,17 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveKeyInput = document.getElementById('save-key');
     const saveBtn = document.getElementById('saveBtn');
     const discardBtn = document.getElementById('discardBtn');
-    
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginBtn = document.getElementById('adminLoginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminDataTable = document.getElementById('admin-data-table');
-    
     const loginModal = document.getElementById('login-modal');
     const loginForm = document.getElementById('login-form');
     const closeButton = document.querySelector('.close-button');
     const loginError = document.getElementById('login-error');
-
     const nameModal = document.getElementById('name-modal');
     const nameForm = document.getElementById('name-form');
     const userNameInput = document.getElementById('userNameInput');
@@ -40,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let tempSession = null;
     let currentUserName = null;
 
-    // --- User Name Handling ---
+    // User Name Handling
     function checkUserName() {
         const savedName = localStorage.getItem('tempMailUserName');
         if (savedName) {
@@ -65,40 +60,35 @@ document.addEventListener('DOMContentLoaded', () => {
     
     checkUserName();
 
-    // --- Random Username Generator ---
+    // Random Username Generator
     function generateRandomUsername() {
         const adjectives = ["Quick", "Lazy", "Sleepy", "Noisy", "Hungry", "Funny", "Happy", "Red", "Green", "Blue", "Dark", "Bright"];
         const nouns = ["Fox", "Dog", "Cat", "Lion", "Tiger", "Bear", "Panda", "Goat", "Frog", "Ant", "Wolf", "Eagle"];
         const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
         const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-        const randomNumber = Math.floor(100 + Math.random() * 900); // 3-digit number
+        const randomNumber = Math.floor(100 + Math.random() * 900);
         return `${randomAdjective}${randomNoun}${randomNumber}`;
     }
 
-    // --- Email Generation & Inbox Functions (using Mail.tm) ---
+    // Email Generation & Inbox Functions (using Mail.tm)
     async function createAccount() {
         try {
-            // 1. Get a domain from Mail.tm
             const domainRes = await fetch('https://api.mail.tm/domains');
             if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.tm.');
             const domains = await domainRes.json();
             const domain = domains['hydra:member'][0]['domain'];
-
-            // 2. Generate random credentials
             const emailUsername = Math.random().toString(36).substring(2, 12);
             const password = Math.random().toString(36).substring(2, 15);
             const email = `${emailUsername}@${domain}`;
-            const generatedUsername = generateRandomUsername(); // Generate a random username
+            const generatedUsername = generateRandomUsername();
             const accountData = { address: email, password: password };
 
-            // 3. Create account on Mail.tm
             await fetch('https://api.mail.tm/accounts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(accountData)
             });
 
-            // 4. Get auth token
             const tokenRes = await fetch('https://api.mail.tm/token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -107,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!tokenRes.ok) throw new Error('Failed to get auth token.');
             const tokenData = await tokenRes.json();
             
-            return { email, password, token: tokenData.token, username: generatedUsername }; // Return username
+            return { email, password, token: tokenData.token, username: generatedUsername };
 
         } catch (error) {
             console.error("Mail.tm API Error:", error);
@@ -145,11 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Google Sheets Functions ---
+    // Google Sheets Functions
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
-            // Add generatedUsername to the data being saved
             const dataToSave = { 
                 key, 
                 email: account.email, 
@@ -182,10 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
                  return;
             }
             const headers = data.shift();
-            // Update table headers for the admin panel
             let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>Username</th><th>${headers[2]}</th><th>User Name</th><th>Timestamp</th></tr></thead><tbody>`;
             data.forEach(row => {
-                // Update table rows to display all data
                 const key = row[0] || 'N/A';
                 const email = row[1] || 'N/A';
                 const password = row[2] || 'N/A';
@@ -203,21 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners ---
+    // Event Listeners
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
         newEmailSection.classList.add('hidden');
-        
         const account = await createAccount();
-        
         loader.classList.add('hidden');
         generateBtn.disabled = false;
 
         if (account) {
             tempSession = account;
             emailDisplay.textContent = account.email;
-            usernameDisplay.textContent = account.username; // Display username
+            usernameDisplay.textContent = account.username;
             passwordDisplay.textContent = account.password;
             newEmailSection.classList.remove('hidden');
             inboxStatus.textContent = "Your inbox is empty.";
@@ -287,3 +272,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// --- tsParticles Initialization ---
+window.addEventListener('load', () => {
+    tsParticles.load("tsparticles", {
+        fpsLimit: 60,
+        interactivity: {
+            events: {
+                onHover: {
+                    enable: true,
+                    mode: "repulse",
+                },
+                resize: true,
+            },
+            modes: {
+                repulse: {
+                    distance: 100,
+                    duration: 0.4,
+                },
+            },
+        },
+        particles: {
+            color: {
+                value: "#ffffff",
+            },
+            links: {
+                color: "#ffffff",
+                distance: 150,
+                enable: true,
+                opacity: 0.5,
+                width: 1,
+            },
+            collisions: {
+                enable: true,
+            },
+            move: {
+                direction: "none",
+                enable: true,
+                outModes: {
+                    default: "bounce",
+                },
+                random: false,
+                speed: 2,
+                straight: false,
+            },
+            number: {
+                density: {
+                    enable: true,
+                    area: 800,
+                },
+                value: 80,
+            },
+            opacity: {
+                value: 0.5,
+            },
+            shape: {
+                type: "circle",
+            },
+            size: {
+                value: { min: 1, max: 5 },
+            },
+        },
+        detectRetina: true,
+    });
+});
