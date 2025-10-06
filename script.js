@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
-    // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
-    // নিশ্চিত করুন যে URL টি ডাবল কোটেশন (" ") এর ভেতরে আছে
+    // Google Apps Script URL বা Firebase Config এখানে থাকবে
     // =================================================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
 
     // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'password123';
+    const ADMIN_PASSWORD = 'Arifur';
 
     // --- HTML Elements ---
+    // User Section
     const userSection = document.getElementById('user-section');
     const generateBtn = document.getElementById('generateBtn');
     const loader = document.getElementById('loader');
@@ -23,12 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('saveBtn');
     const discardBtn = document.getElementById('discardBtn');
     const savedAccountsList = document.getElementById('saved-accounts-list');
-    
+
+    // Admin Section
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginBtn = document.getElementById('adminLoginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminDataTable = document.getElementById('admin-data-table');
     
+    // Modal Section
     const loginModal = document.getElementById('login-modal');
     const loginForm = document.getElementById('login-form');
     const closeButton = document.querySelector('.close-button');
@@ -82,17 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.classList.remove('hidden');
         try {
             const dataToSave = { key, email: account.email, password: account.password };
-            
-            // Google Sheets requires a specific format for POST requests
-            const response = await fetch(SCRIPT_URL, {
+            await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Important for simple POST requests to Apps Script
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: JSON.stringify(dataToSave)
             });
-
             alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
         } catch (error) {
             console.error("Error saving data to Google Sheet:", error);
@@ -107,12 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(SCRIPT_URL);
             const data = await response.json();
-            
-            if (data.length < 2) { // Checks if there's any data beyond the header
+            if (data.length < 2) {
                  adminDataTable.innerHTML = '<p>এখনও কোনো তথ্য সেভ করা হয়নি।</p>';
                  return;
             }
-
             const headers = data.shift();
             let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>${headers[2]}</th><th>${headers[3]}</th></tr></thead><tbody>`;
             data.forEach(row => {
@@ -131,12 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
         newEmailSection.classList.add('hidden');
-        
         const account = await createAccount();
-        
         loader.classList.add('hidden');
         generateBtn.disabled = false;
-
         if (account) {
             tempSession = account;
             emailDisplay.textContent = account.email;
