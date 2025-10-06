@@ -34,12 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tempSession = null;
 
-    // --- Email Generation & Inbox Functions (using Mail.gw) ---
+    // --- Email Generation & Inbox Functions (using Mail.tm) ---
     async function createAccount() {
         try {
-            // 1. Get a domain from Mail.gw
-            const domainRes = await fetch('https://api.mail.gw/domains');
-            if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.gw.');
+            // 1. Get a domain from Mail.tm
+            const domainRes = await fetch('https://api.mail.tm/domains');
+            if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.tm.');
             const domains = await domainRes.json();
             const domain = domains['hydra:member'][0]['domain'];
 
@@ -49,15 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = `${username}@${domain}`;
             const accountData = { address: email, password: password };
 
-            // 3. Create account on Mail.gw
-            await fetch('https://api.mail.gw/accounts', {
+            // 3. Create account on Mail.tm
+            await fetch('https://api.mail.tm/accounts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(accountData)
             });
 
             // 4. Get auth token for the new account
-            const tokenRes = await fetch('https://api.mail.gw/token', {
+            const tokenRes = await fetch('https://api.mail.tm/token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(accountData)
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return { email, password, token: tokenData.token };
 
         } catch (error) {
-            console.error("Mail.gw API Error:", error);
+            console.error("Mail.tm API Error:", error);
             alert(`Error creating email: ${error.message}`);
             return null;
         }
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inboxStatus.textContent = "Checking for new messages...";
         inboxMessages.innerHTML = '';
         try {
-            const res = await fetch('https://api.mail.gw/messages', {
+            const res = await fetch('https://api.mail.tm/messages', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('Failed to fetch messages.');
