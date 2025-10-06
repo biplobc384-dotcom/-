@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <div id="user-section">
+        <div id="user-section" class="hidden">
             <h1>Temp Mail Generator 📨</h1>
 
             <div class="card main-controls">
@@ -75,6 +75,21 @@
             </form>
         </div>
     </div>
+
+    <div id="name-modal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome!</h2>
+            <p>Please enter your name to continue.</p>
+            <form id="name-form">
+                <div class="form-group">
+                    <label for="userNameInput">Your Name:</label>
+                    <input type="text" id="userNameInput" required>
+                </div>
+                <button type="submit">Save Name</button>
+            </form>
+        </div>
+    </div>
+
 
     <script src="script.js"></script> 
 </body>
