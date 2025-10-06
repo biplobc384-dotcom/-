@@ -17,7 +17,23 @@
             </div>
             
             <div id="new-email-section" class="card hidden">
+                <h3>Your New Temporary Email:</h3>
+                <p><strong>Email:</strong> <code id="email-display"></code></p>
+                <p><strong>Password:</strong> <code id="password-display"></code></p>
+                
+                <div class="inbox-container">
+                    <button id="checkInboxBtn">📥 Check Inbox</button>
+                    <p id="inbox-status" style="margin-top: 10px;">Your inbox is empty.</p>
+                    <div id="inbox-messages"></div>
                 </div>
+
+                <div class="save-section">
+                    <h4>Save this Account (Optional)</h4>
+                    <input type="text" id="save-key" placeholder="Enter a key to save (e.g., Facebook)">
+                    <button id="saveBtn">💾 Save</button>
+                    <button id="discardBtn" class="danger">🗑️ Discard</button>
+                </div>
+            </div>
 
             <div class="card">
                 <h2>💾 Saved Accounts</h2>
