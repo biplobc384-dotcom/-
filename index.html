@@ -11,8 +11,14 @@
         <div id="login-view" class="card">
             <h1>Login</h1>
             <form id="login-form">
-                <div class="form-group"><label for="login-email">Email:</label><input type="email" id="login-email" required></div>
-                <div class="form-group"><label for="login-password">Password:</label><input type="password" id="login-password" required></div>
+                <div class="form-group">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" required>
+                </div>
                 <button type="submit">Login</button>
                 <p id="login-error" class="error-message"></p>
                 <div class="auth-links">
@@ -25,8 +31,14 @@
         <div id="register-view" class="card hidden">
             <h1>Create Account</h1>
             <form id="register-form">
-                <div class="form-group"><label for="register-email">Email:</label><input type="email" id="register-email" required></div>
-                <div class="form-group"><label for="register-password">Password:</label><input type="password" id="register-password" required></div>
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" required>
+                </div>
                 <button type="submit">Register</button>
                 <p id="register-error" class="error-message"></p>
                 <div class="auth-links">
@@ -49,13 +61,15 @@
                 </div>
             <div class="card">
                 <h2>💾 My Saved Accounts</h2>
-                <div id="saved-accounts-list"><p>Loading saved accounts...</p></div>
+                <div id="saved-accounts-list"></div>
             </div>
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
     <script src="script.js"></script> 
 </body>
 </html>
