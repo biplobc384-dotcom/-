@@ -1,81 +1,102 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
-    // Supabase থেকে পাওয়া আপনার URL এবং Public Key এখানে পেস্ট করুন
+    // ধাপ ১ থেকে কপি করা আপনার সঠিক Firebase কনফিগারেশন কোডটি এখানে পেস্ট করুন
     // =================================================================
-    const SUPABASE_URL = 'https://fogywudjbxhafinnewth.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZ3l3dWRqYnhoYWZpbm5ld3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3Mjg5MjUsImV4cCI6MjA3NTMwNDkyNX0.7UHH2a5SEPomulPjG-d3_WGrrSjyB6wwQh202qkE640';
+    const firebaseConfig = {
+     apiKey: "AIzaSyCNoI8_de_V5kc6WukRGb6KU5KAPOwQQaY",
+  authDomain: "web-site-b12eb.firebaseapp.com",
+  projectId: "web-site-b12eb",
+  storageBucket: "web-site-b12eb.firebasestorage.app",
+  messagingSenderId: "624092074743",
+  appId: "1:624092074743:web:505afcc9172481ff4239f2",
+  measurementId: "G-5958JRM3KX"
+    };
 
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Firebase মাত্র একবার Initialize করা হচ্ছে
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // --- Views & Forms ---
+    // --- Views ---
     const loginView = document.getElementById('login-view');
     const registerView = document.getElementById('register-view');
     const appView = document.getElementById('app-view');
+
+    // --- Forms & Buttons ---
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const logoutBtn = document.getElementById('logout-btn');
     const showRegisterBtn = document.getElementById('show-register-btn');
     const showLoginBtn = document.getElementById('show-login-btn');
     const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    
+    // --- App Elements ---
     const welcomeMessage = document.getElementById('welcome-message');
     const generateBtn = document.getElementById('generateBtn');
-    
-    // --- Authentication Logic ---
-    const user = supabase.auth.user();
-    if (user) {
-        showAppView(user);
-    } else {
-        showLoginView();
-    }
-    
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (session?.user) {
-            showAppView(session.user);
+
+    // --- Authentication State Observer ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            loginView.classList.add('hidden');
+            registerView.classList.add('hidden');
+            appView.classList.remove('hidden');
+            welcomeMessage.textContent = `Welcome, ${user.email}`;
         } else {
-            showLoginView();
+            loginView.classList.remove('hidden');
+            registerView.classList.add('hidden');
+            appView.classList.add('hidden');
         }
     });
 
-    registerForm.addEventListener('submit', async (e) => {
+    // --- Authentication Event Listeners ---
+    registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const errorP = document.getElementById('register-error');
         errorP.textContent = '';
 
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) errorP.textContent = error.message;
+        auth.createUserWithEmailAndPassword(email, password)
+            .catch(error => {
+                errorP.textContent = error.message;
+            });
     });
 
-    loginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         const errorP = document.getElementById('login-error');
         errorP.textContent = '';
-        
-        const { error } = await supabase.auth.signIn({ email, password });
-        if (error) errorP.textContent = error.message;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .catch(error => {
+                errorP.textContent = error.message;
+            });
     });
 
-    logoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
+    logoutBtn.addEventListener('click', () => {
+        auth.signOut();
     });
 
-    forgotPasswordBtn.addEventListener('click', async () => {
+    forgotPasswordBtn.addEventListener('click', () => {
         const email = document.getElementById('login-email').value;
         const errorP = document.getElementById('login-error');
         if (!email) {
-            errorP.textContent = 'Please enter your email to reset password.';
+            errorP.textContent = 'Please enter your email to reset the password.';
             return;
         }
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
-        if (error) {
-            errorP.textContent = error.message;
-        } else {
-            alert('Password reset email sent! Please check your inbox.');
-            errorP.textContent = '';
-        }
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
+                alert('Password reset email sent! Please check your inbox.');
+                errorP.textContent = '';
+            })
+            .catch(error => {
+                errorP.textContent = error.message;
+            });
     });
 
     showRegisterBtn.addEventListener('click', () => {
@@ -88,25 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
         registerView.classList.add('hidden');
     });
 
-    // --- View Management ---
-    function showLoginView() {
-        loginView.classList.remove('hidden');
-        registerView.classList.add('hidden');
-        appView.classList.add('hidden');
-    }
-
-    function showAppView(user) {
-        loginView.classList.add('hidden');
-        registerView.classList.add('hidden');
-        appView.classList.remove('hidden');
-        welcomeMessage.textContent = `Welcome, ${user.email}`;
-    }
-
     // --- App Logic ---
     generateBtn.addEventListener('click', () => {
-        alert("Generate Email button clicked! (Add your email generation logic here)");
+        alert("Generate Email button clicked! (Add email generation logic here)");
     });
 });
-
-
-
