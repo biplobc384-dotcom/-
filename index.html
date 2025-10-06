@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temp Mail Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="user-section">
+            <h1>Temp Mail Generator 📨</h1>
+
+            <div class="card main-controls">
+                <button id="generateBtn">🔄 Generate New Email</button>
+                <div id="loader" class="loader hidden"></div>
+            </div>
+            
+            <div id="new-email-section" class="card hidden">
+                </div>
+
+            <div class="card">
+                <h2>💾 Saved Accounts</h2>
+                <div id="saved-accounts-list">
+                    <p>No accounts saved yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-panel" class="card hidden">
+            <h1>Admin Dashboard</h1>
+            <p>Here is all the data saved from the Google Sheet.</p>
+            <button id="logoutBtn" class="danger">Logout</button>
+            <hr>
+            <h2>All Saved Data</h2>
+            <div id="admin-data-table"></div>
+        </div>
+        
+        <div class="admin-login-footer">
+            <button id="adminLoginBtn">Admin Login</button>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+</html>
