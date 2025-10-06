@@ -100,14 +100,6 @@ code {
     background-color: #f9f9f9;
 }
 
-.saved-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
 .loader {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
@@ -126,18 +118,32 @@ code {
     margin-top: 20px;
 }
 
-/* Helper Class */
 .hidden {
     display: none !important;
 }
 
-/* Admin Login Button Footer */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.app-header h1 {
+    margin: 0;
+}
+
+#welcome-message {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .admin-login-footer {
     text-align: center;
     margin-top: 20px;
 }
 
-/* Modal Styles */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -180,7 +186,6 @@ code {
     text-decoration: none;
 }
 
-/* Form Styles inside Modal */
 .form-group {
     margin-bottom: 15px;
 }
@@ -197,7 +202,6 @@ label {
     font-size: 14px;
 }
 
-/* Admin Table Styles */
 #admin-data-table table {
     width: 100%;
     border-collapse: collapse;
@@ -213,4 +217,24 @@ label {
 
 #admin-data-table th {
     background-color: #f2f2f2;
+}
+
+.reset-account-section {
+    text-align: center;
+    margin-top: 15px;
+}
+
+button.link-button {
+    background-color: transparent;
+    color: #007bff;
+    padding: 5px;
+    margin: 0;
+    border: none;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+button.link-button:hover {
+    background-color: transparent;
+    color: #0056b3;
 }
