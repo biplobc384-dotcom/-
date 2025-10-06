@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
+    // নিশ্চিত করুন যে URL টি ডাবল কোটেশন (" ") এর ভেতরে আছে
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/আপনার-ইউআরএল-এখানে/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
 
     // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'Arifur';
+    const ADMIN_PASSWORD = 'password123';
 
     // --- HTML Elements ---
     const userSection = document.getElementById('user-section');
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveKeyInput = document.getElementById('save-key');
     const saveBtn = document.getElementById('saveBtn');
     const discardBtn = document.getElementById('discardBtn');
+    const savedAccountsList = document.getElementById('saved-accounts-list');
     
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -34,58 +36,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tempSession = null;
 
-    // --- Email Generation & Inbox Functions (using Mail.gw) ---
+    // --- Email Generation Functions ---
     async function createAccount() {
         try {
-            // 1. Get a domain from Mail.gw
-            const domainRes = await fetch('https://api.mail.gw/domains');
-            if (!domainRes.ok) throw new Error('Failed to fetch domains from Mail.gw.');
-            const domains = await domainRes.json();
-            const domain = domains['hydra:member'][0]['domain'];
-
-            // 2. Generate random credentials
-            const username = Math.random().toString(36).substring(2, 12);
-            const password = Math.random().toString(36).substring(2, 15);
-            const email = `${username}@${domain}`;
-            const accountData = { address: email, password: password };
-
-            // 3. Create account on Mail.gw
-            await fetch('https://api.mail.gw/accounts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accountData)
-            });
-
-            // 4. Get auth token for the new account
-            const tokenRes = await fetch('https://api.mail.gw/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accountData)
-            });
-            if (!tokenRes.ok) throw new Error('Failed to get auth token.');
-            const tokenData = await tokenRes.json();
-            
-            return { email, password, token: tokenData.token };
-
+            const res = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
+            if (!res.ok) throw new Error('Failed to generate email from 1secmail.');
+            const data = await res.json();
+            const email = data[0];
+            const password = Math.random().toString(36).substring(2, 12);
+            return { email, password, token: email };
         } catch (error) {
-            console.error("Mail.gw API Error:", error);
+            console.error("1secmail API Error:", error);
             alert(`Error creating email: ${error.message}`);
             return null;
         }
     }
 
-    async function checkInbox(token) {
-        if (!token) return;
+    async function checkInbox(email) {
+        if (!email) return;
         inboxStatus.textContent = "Checking for new messages...";
         inboxMessages.innerHTML = '';
+        const [login, domain] = email.split('@');
         try {
-            const res = await fetch('https://api.mail.gw/messages', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Failed to fetch messages.');
-            const data = await res.json();
-            const messages = data['hydra:member'];
-
+            const res = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${login}&domain=${domain}`);
+            const messages = await res.json();
             if (messages.length === 0) {
                 inboxStatus.textContent = "Your inbox is empty.";
             } else {
@@ -93,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 messages.forEach(msg => {
                     const msgDiv = document.createElement('div');
                     msgDiv.className = 'message';
-                    msgDiv.innerHTML = `<p><strong>From:</strong> <code>${msg.from.address}</code></p><p><strong>Subject:</strong> ${msg.subject}</p><p>${msg.intro}</p>`;
+                    msgDiv.innerHTML = `<p><strong>From:</strong> <code>${msg.from}</code></p><p><strong>Subject:</strong> ${msg.subject}</p><p>${msg.date}</p>`;
                     inboxMessages.appendChild(msgDiv);
                 });
             }
@@ -103,20 +77,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Google Sheets Functions (এগুলো অপরিবর্তিত) ---
+    // --- Google Sheets Functions ---
     async function saveAccount(key, account) {
         loader.classList.remove('hidden');
         try {
             const dataToSave = { key, email: account.email, password: account.password };
-            await fetch(SCRIPT_URL, {
+            
+            // Google Sheets requires a specific format for POST requests
+            const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                mode: 'no-cors', // Important for simple POST requests to Apps Script
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
                 body: JSON.stringify(dataToSave)
             });
+
             alert(`"${key}" কী (Key) দিয়ে তথ্য সফলভাবে সেভ হয়েছে!`);
         } catch (error) {
-            console.error("Error saving data:", error);
+            console.error("Error saving data to Google Sheet:", error);
             alert("তথ্য সেভ করার সময় একটি সমস্যা হয়েছে।");
         } finally {
             loader.classList.add('hidden');
@@ -128,10 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(SCRIPT_URL);
             const data = await response.json();
-            if (data.length < 2) {
+            
+            if (data.length < 2) { // Checks if there's any data beyond the header
                  adminDataTable.innerHTML = '<p>এখনও কোনো তথ্য সেভ করা হয়নি।</p>';
                  return;
             }
+
             const headers = data.shift();
             let tableHTML = `<table><thead><tr><th>${headers[0]}</th><th>${headers[1]}</th><th>${headers[2]}</th><th>${headers[3]}</th></tr></thead><tbody>`;
             data.forEach(row => {
@@ -145,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners (এগুলো অপরিবর্তিত) ---
+    // --- Event Listeners ---
     generateBtn.addEventListener('click', async () => {
         loader.classList.remove('hidden');
         generateBtn.disabled = true;
@@ -167,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     checkInboxBtn.addEventListener('click', () => {
-        if (tempSession) checkInbox(tempSession.token);
+        if (tempSession) checkInbox(tempSession.email);
     });
 
     saveBtn.addEventListener('click', () => {
