@@ -1,11 +1,17 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
     color: #333;
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
+
+    /* --- ব্যাকগ্রাউন্ড ছবির জন্য নতুন কোড --- */
+    background-image: url('https://images.unsplash.com/photo-1492694229532-c7f7a5a5c69b?q=80&w=2070&auto=format&fit=crop'); /* এই URL পরিবর্তন করে আপনার ছবির লিঙ্ক দিন */
+    background-size: cover;          /* ছবিকে পুরো ব্যাকগ্রাউন্ড জুড়ে দেখাবে */
+    background-position: center;     /* ছবিটিকে মাঝখানে রাখবে */
+    background-repeat: no-repeat;    /* ছবির পুনরাবৃত্তি বন্ধ করবে */
+    background-attachment: fixed;    /* স্ক্রল করার সময় الخلفية স্থির থাকবে */
 }
 
 .container {
@@ -23,7 +29,7 @@ h1 {
 }
 
 .card {
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.9); /* কার্ডগুলোকে হালকা স্বচ্ছ করা হয়েছে */
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
