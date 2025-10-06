@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
     // Google Apps Script থেকে পাওয়া আপনার Web App URL টি এখানে পেস্ট করুন
     // =================================================================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJc2oEk2yOh-QJYLtC14_hdsKb5xQfIpI2Rl9BdGd2FaTW0DSHXQdPtziqZTxWQs0Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxru_GEkQFovsdJUjUQORWyM4GFClV5kvyWjm9V_pa2gwB6NMea_q9RXjgEajk4XZCl/exec";
 
     // --- ADMIN ---
     const ADMIN_USERNAME = 'admin';
@@ -270,3 +270,4 @@ document.addEventListener('DOMContentLoaded', () => {
         checkUserName(); // Re-check user name on logout
     });
 });
+
