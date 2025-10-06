@@ -5,18 +5,22 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
+}
 
-    /* --- ব্যাকগ্রাউন্ড ছবির জন্য নতুন কোড --- */
-    background-image: url('https://images.unsplash.com/photo-1492694229532-c7f7a5a5c69b?q=80&w=2070&auto=format&fit=crop'); /* এই URL পরিবর্তন করে আপনার ছবির লিঙ্ক দিন */
-    background-size: cover;          /* ছবিকে পুরো ব্যাকগ্রাউন্ড জুড়ে দেখাবে */
-    background-position: center;     /* ছবিটিকে মাঝখানে রাখবে */
-    background-repeat: no-repeat;    /* ছবির পুনরাবৃত্তি বন্ধ করবে */
-    background-attachment: fixed;    /* স্ক্রল করার সময় الخلفية স্থির থাকবে */
+#tsparticles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: #1a1a2e;
 }
 
 .container {
     max-width: 700px;
     width: 100%;
+    z-index: 1; /* কন্টেন্টকে ব্যাকগ্রাউন্ডের উপরে রাখে */
 }
 
 h1, h2, h3, h4 {
@@ -26,14 +30,15 @@ h1, h2, h3, h4 {
 h1 {
     text-align: center;
     margin-bottom: 20px;
+    color: #ffffff; /* হেডিং এর রঙ সাদা করা হয়েছে */
 }
 
 .card {
-    background-color: rgba(255, 255, 255, 0.9); /* কার্ডগুলোকে হালকা স্বচ্ছ করা হয়েছে */
+    background-color: rgba(255, 255, 255, 0.95); /* কার্ডগুলোকে হালকা স্বচ্ছ করা হয়েছে */
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px_4px_rgba(0, 0, 0, 0.1);
 }
 
 button {
@@ -106,14 +111,6 @@ code {
     background-color: #f9f9f9;
 }
 
-.saved-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
 .loader {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
@@ -132,18 +129,15 @@ code {
     margin-top: 20px;
 }
 
-/* Helper Class */
 .hidden {
     display: none !important;
 }
 
-/* Admin Login Button Footer */
 .admin-login-footer {
     text-align: center;
     margin-top: 20px;
 }
 
-/* Modal Styles */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -186,7 +180,6 @@ code {
     text-decoration: none;
 }
 
-/* Form Styles inside Modal */
 .form-group {
     margin-bottom: 15px;
 }
@@ -203,7 +196,6 @@ label {
     font-size: 14px;
 }
 
-/* Admin Table Styles */
 #admin-data-table table {
     width: 100%;
     border-collapse: collapse;
